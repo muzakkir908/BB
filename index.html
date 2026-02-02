@@ -1,0 +1,857 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>For You, My Love</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Poppins:wght@300;400;600&display=swap');
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a0a1e 0%, #2d1133 30%, #4a1942 60%, #1a0a1e 100%);
+      overflow-x: hidden;
+      font-family: 'Poppins', sans-serif;
+      color: #fff;
+    }
+
+    /* ==================== FLOATING HEARTS ==================== */
+    .hearts-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .heart {
+      position: absolute;
+      bottom: -60px;
+      font-size: 20px;
+      animation: floatUp linear infinite;
+      opacity: 0.5;
+    }
+
+    @keyframes floatUp {
+      0%   { transform: translateY(0) rotate(0deg) scale(1); opacity: 0.5; }
+      50%  { opacity: 0.8; }
+      100% { transform: translateY(-110vh) rotate(360deg) scale(0.5); opacity: 0; }
+    }
+
+    /* ==================== SPARKLE CURSOR ==================== */
+    .sparkle {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      font-size: 12px;
+      animation: sparkleFade 0.8s ease-out forwards;
+    }
+
+    @keyframes sparkleFade {
+      0%   { transform: scale(1) translateY(0); opacity: 1; }
+      100% { transform: scale(0) translateY(-40px); opacity: 0; }
+    }
+
+    /* ==================== PROPOSAL SECTION ==================== */
+    #proposal {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      padding: 20px;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+
+    #proposal.hidden {
+      opacity: 0;
+      transform: scale(0.8);
+      pointer-events: none;
+      position: absolute;
+    }
+
+    .envelope {
+      width: 180px;
+      height: 140px;
+      margin-bottom: 30px;
+      cursor: pointer;
+      animation: envelopeBounce 2s ease-in-out infinite;
+      position: relative;
+    }
+
+    @keyframes envelopeBounce {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-15px); }
+    }
+
+    .envelope svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 10px 30px rgba(255, 100, 150, 0.4));
+    }
+
+    .proposal-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700;
+      background: linear-gradient(135deg, #ff6b9d, #ff4081, #ff80ab, #ff6b9d);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+      margin-bottom: 15px;
+      text-shadow: none;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50%      { background-position: 100% 50%; }
+    }
+
+    .proposal-sub {
+      font-size: clamp(1rem, 2.5vw, 1.3rem);
+      color: #ffb3cc;
+      margin-bottom: 50px;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 40px;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      min-height: 80px;
+    }
+
+    .btn-yes {
+      padding: 18px 60px;
+      font-size: 1.4rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #ff4081, #ff6b9d);
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 8px 30px rgba(255, 64, 129, 0.5);
+      transition: all 0.3s ease;
+      letter-spacing: 1px;
+      position: relative;
+      overflow: hidden;
+      z-index: 2;
+    }
+
+    .btn-yes::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .btn-yes:hover::before {
+      left: 100%;
+    }
+
+    .btn-yes:hover {
+      transform: scale(1.1);
+      box-shadow: 0 12px 40px rgba(255, 64, 129, 0.7);
+    }
+
+    .btn-no {
+      padding: 18px 60px;
+      font-size: 1.4rem;
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50px;
+      background: transparent;
+      color: rgba(255, 255, 255, 0.6);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: absolute;
+      z-index: 1;
+      user-select: none;
+    }
+
+    /* ==================== CELEBRATION (YES) ==================== */
+    #celebration {
+      position: relative;
+      z-index: 10;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 40px 20px;
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    #celebration.show {
+      display: flex;
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .big-heart-anim {
+      font-size: 100px;
+      animation: heartBeat 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+
+    @keyframes heartBeat {
+      0%, 100% { transform: scale(1); }
+      25%      { transform: scale(1.15); }
+      50%      { transform: scale(1); }
+      75%      { transform: scale(1.1); }
+    }
+
+    .celebration-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      background: linear-gradient(135deg, #ff4081, #ffab40, #ff4081);
+      background-size: 300% 300%;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s ease-in-out infinite;
+      margin-bottom: 15px;
+    }
+
+    .love-message {
+      max-width: 700px;
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      line-height: 1.8;
+      color: #ffc1d6;
+      text-align: center;
+      margin-bottom: 50px;
+      font-weight: 300;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      border: 1px solid rgba(255, 100, 150, 0.15);
+      backdrop-filter: blur(10px);
+    }
+
+    .love-message p {
+      margin-bottom: 15px;
+    }
+
+    .love-message .signature {
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.6rem;
+      color: #ff80ab;
+      margin-top: 20px;
+    }
+
+    /* ==================== PHOTO/VIDEO GALLERY ==================== */
+    .gallery-title {
+      font-family: 'Dancing Script', cursive;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: #ff80ab;
+      margin-bottom: 30px;
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+      width: 100%;
+      max-width: 1100px;
+      margin-bottom: 50px;
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 100, 150, 0.15);
+      cursor: pointer;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      animation: fadeInUp 0.8s ease forwards;
+      opacity: 0;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 50px rgba(255, 64, 129, 0.3);
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .gallery-item img,
+    .gallery-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .gallery-item .caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      padding: 20px 15px 15px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.8));
+      font-size: 0.9rem;
+      color: #ffcdd2;
+      font-weight: 300;
+    }
+
+    .gallery-item .play-icon {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 50px;
+      opacity: 0.8;
+      pointer-events: none;
+      text-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    /* ==================== PLACEHOLDER INSTRUCTIONS ==================== */
+    .placeholder-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 30px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 2px dashed rgba(255, 100, 150, 0.25);
+      border-radius: 16px;
+      aspect-ratio: 1;
+    }
+
+    .placeholder-card .icon {
+      font-size: 50px;
+      margin-bottom: 15px;
+      opacity: 0.6;
+    }
+
+    .placeholder-card p {
+      color: rgba(255, 200, 220, 0.6);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    .placeholder-card code {
+      background: rgba(255,255,255,0.08);
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      color: #ff80ab;
+    }
+
+    /* ==================== LIGHTBOX ==================== */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.92);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox img,
+    .lightbox video {
+      max-width: 90%;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 25px; right: 30px;
+      font-size: 2rem;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      z-index: 1001;
+    }
+
+    .lightbox-close:hover {
+      transform: rotate(90deg);
+    }
+
+    /* ==================== CONFETTI ==================== */
+    .confetti-piece {
+      position: fixed;
+      top: -20px;
+      z-index: 100;
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      animation: confettiFall linear forwards;
+      pointer-events: none;
+    }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ==================== MUSIC TOGGLE ==================== */
+    .music-toggle {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      z-index: 500;
+      width: 55px;
+      height: 55px;
+      border-radius: 50%;
+      border: 2px solid rgba(255, 100, 150, 0.4);
+      background: rgba(255, 64, 129, 0.15);
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      transition: all 0.3s ease;
+      color: #ff80ab;
+    }
+
+    .music-toggle:hover {
+      background: rgba(255, 64, 129, 0.3);
+      transform: scale(1.1);
+    }
+
+    .music-toggle.playing .bars span {
+      animation: musicBar 0.6s ease-in-out infinite alternate;
+    }
+
+    .bars {
+      display: flex;
+      gap: 3px;
+      align-items: flex-end;
+      height: 18px;
+    }
+
+    .bars span {
+      display: block;
+      width: 3px;
+      background: #ff80ab;
+      border-radius: 2px;
+      height: 5px;
+      transition: height 0.2s ease;
+    }
+
+    .bars span:nth-child(1) { animation-delay: 0s; }
+    .bars span:nth-child(2) { animation-delay: 0.15s; }
+    .bars span:nth-child(3) { animation-delay: 0.3s; }
+    .bars span:nth-child(4) { animation-delay: 0.45s; }
+
+    @keyframes musicBar {
+      0%   { height: 5px; }
+      100% { height: 18px; }
+    }
+
+    /* ==================== FOOTER ==================== */
+    .footer {
+      text-align: center;
+      padding: 30px;
+      color: rgba(255, 200, 220, 0.3);
+      font-size: 0.8rem;
+      font-family: 'Dancing Script', cursive;
+      font-size: 1.1rem;
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 600px) {
+      .buttons { gap: 20px; flex-direction: column; min-height: 160px; }
+      .btn-yes, .btn-no { padding: 15px 50px; font-size: 1.2rem; }
+      .gallery { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Hearts Background -->
+  <div class="hearts-bg" id="heartsBg"></div>
+
+  <!-- ==================== PROPOSAL SECTION ==================== -->
+  <section id="proposal">
+    <div class="envelope" id="envelope">
+      <svg viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="10" y="30" width="180" height="120" rx="12" fill="#ff4081" opacity="0.2" stroke="#ff6b9d" stroke-width="2"/>
+        <path d="M10 42 L100 100 L190 42" stroke="#ff6b9d" stroke-width="2" fill="none"/>
+        <path d="M10 30 L100 90 L190 30" fill="#ff4081" opacity="0.3" stroke="#ff6b9d" stroke-width="2"/>
+        <text x="100" y="18" text-anchor="middle" fill="#ff80ab" font-size="22">&#x1F48C;</text>
+      </svg>
+    </div>
+
+    <h1 class="proposal-title">Will You Be My Valentine?</h1>
+    <p class="proposal-sub">I have something special to ask you...</p>
+
+    <div class="buttons">
+      <button class="btn-yes" id="btnYes">Yes!</button>
+      <button class="btn-no" id="btnNo">No</button>
+    </div>
+  </section>
+
+  <!-- ==================== CELEBRATION SECTION ==================== -->
+  <section id="celebration">
+    <div class="big-heart-anim">&#x1F496;</div>
+    <h1 class="celebration-title">She Said Yes!</h1>
+
+    <div class="love-message">
+      <p>Every moment with you feels like a beautiful dream I never want to wake up from. You are my sunshine on cloudy days, my calm in every storm, and the reason my heart beats a little faster every single day.</p>
+      <p>From our silly laughs to our deep conversations at 2 AM, every second with you is a memory I treasure. You make the ordinary feel extraordinary, and I am so incredibly lucky to call you mine.</p>
+      <p>This Valentine's Day, I just want you to know &mdash; you are my favorite person in the entire universe, and I choose you today, tomorrow, and always.</p>
+      <p class="signature">Forever Yours &#x1F49E;</p>
+    </div>
+
+    <h2 class="gallery-title">Our Beautiful Memories</h2>
+
+    <div class="gallery" id="gallery">
+      <!--
+        ============================================================
+        HOW TO ADD YOUR OWN PHOTOS & VIDEOS:
+        ============================================================
+        1. Create a folder called "photos" next to this index.html
+        2. Put your images (jpg, png) and videos (mp4) in it
+        3. Replace the placeholder items below with your real media.
+
+        For a PHOTO:
+        <div class="gallery-item" onclick="openLightbox(this)">
+          <img src="photos/your-photo.jpg" alt="Caption here" />
+          <div class="caption">Your caption here</div>
+        </div>
+
+        For a VIDEO:
+        <div class="gallery-item" onclick="openLightbox(this)">
+          <video src="photos/your-video.mp4" muted></video>
+          <div class="play-icon">&#9654;</div>
+          <div class="caption">Your caption here</div>
+        </div>
+        ============================================================
+      -->
+
+      <!-- SAMPLE ITEMS (replace these with your real photos & videos) -->
+      <div class="gallery-item" style="animation-delay: 0.1s" onclick="openLightbox(this)">
+        <div class="placeholder-card">
+          <div class="icon">&#x1F4F7;</div>
+          <p>Add your first photo<br/><code>photos/photo1.jpg</code></p>
+        </div>
+      </div>
+
+      <div class="gallery-item" style="animation-delay: 0.2s" onclick="openLightbox(this)">
+        <div class="placeholder-card">
+          <div class="icon">&#x1F3AC;</div>
+          <p>Add your first video<br/><code>photos/video1.mp4</code></p>
+        </div>
+      </div>
+
+      <div class="gallery-item" style="animation-delay: 0.3s" onclick="openLightbox(this)">
+        <div class="placeholder-card">
+          <div class="icon">&#x1F4F7;</div>
+          <p>Add another photo<br/><code>photos/photo2.jpg</code></p>
+        </div>
+      </div>
+
+      <div class="gallery-item" style="animation-delay: 0.4s" onclick="openLightbox(this)">
+        <div class="placeholder-card">
+          <div class="icon">&#x1F4F7;</div>
+          <p>Add another photo<br/><code>photos/photo3.jpg</code></p>
+        </div>
+      </div>
+
+      <div class="gallery-item" style="animation-delay: 0.5s" onclick="openLightbox(this)">
+        <div class="placeholder-card">
+          <div class="icon">&#x1F3AC;</div>
+          <p>Add another video<br/><code>photos/video2.mp4</code></p>
+        </div>
+      </div>
+
+      <div class="gallery-item" style="animation-delay: 0.6s" onclick="openLightbox(this)">
+        <div class="placeholder-card">
+          <div class="icon">&#x1F4F7;</div>
+          <p>Add another photo<br/><code>photos/photo4.jpg</code></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">Made with love, just for you &hearts;</div>
+  </section>
+
+  <!-- ==================== LIGHTBOX ==================== -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <div id="lightboxContent"></div>
+  </div>
+
+  <!-- ==================== MUSIC TOGGLE ==================== -->
+  <button class="music-toggle" id="musicToggle" title="Toggle Music">
+    <div class="bars">
+      <span></span><span></span><span></span><span></span>
+    </div>
+  </button>
+
+  <!--
+    OPTIONAL: Add background music
+    Uncomment the line below and point to your own audio file:
+  -->
+  <!-- <audio id="bgMusic" loop src="photos/song.mp3"></audio> -->
+  <audio id="bgMusic" loop>
+    <!-- Replace with your own song file path -->
+  </audio>
+
+  <!-- ==================== JAVASCRIPT ==================== -->
+  <script>
+    // ========================
+    // FLOATING HEARTS
+    // ========================
+    const heartEmojis = ['\u2764\uFE0F', '\uD83D\uDC95', '\uD83D\uDC96', '\uD83D\uDC97', '\uD83D\uDC93', '\uD83E\uDE77', '\uD83D\uDC98', '\uD83D\uDC9D'];
+    const heartsBg = document.getElementById('heartsBg');
+
+    function createHeart() {
+      const heart = document.createElement('div');
+      heart.classList.add('heart');
+      heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+      heart.style.left = Math.random() * 100 + '%';
+      heart.style.fontSize = (Math.random() * 20 + 14) + 'px';
+      heart.style.animationDuration = (Math.random() * 6 + 6) + 's';
+      heart.style.opacity = Math.random() * 0.4 + 0.2;
+      heartsBg.appendChild(heart);
+      setTimeout(() => heart.remove(), 12000);
+    }
+
+    setInterval(createHeart, 400);
+
+    // ========================
+    // SPARKLE CURSOR
+    // ========================
+    document.addEventListener('mousemove', (e) => {
+      if (Math.random() > 0.85) {
+        const sparkle = document.createElement('div');
+        sparkle.classList.add('sparkle');
+        sparkle.textContent = ['\u2728', '\u2B50', '\uD83D\uDCAB'][Math.floor(Math.random() * 3)];
+        sparkle.style.left = e.clientX + 'px';
+        sparkle.style.top = e.clientY + 'px';
+        document.body.appendChild(sparkle);
+        setTimeout(() => sparkle.remove(), 800);
+      }
+    });
+
+    // ========================
+    // RUNAWAY "NO" BUTTON
+    // ========================
+    const btnNo = document.getElementById('btnNo');
+    const btnYes = document.getElementById('btnYes');
+    const proposal = document.getElementById('proposal');
+
+    let noRunCount = 0;
+    const funnyTexts = [
+      "No",
+      "Are you sure? \uD83E\uDD7A",
+      "Think again!",
+      "Really?! \uD83D\uDE22",
+      "Pretty please?",
+      "I'll be sad... \uD83D\uDE2D",
+      "You can't catch me!",
+      "Try again! \uD83D\uDE1C",
+      "Nope, not here!",
+      "Haha nice try!",
+      "Just say Yes! \uD83D\uDC96"
+    ];
+
+    function moveNoButton() {
+      const proposalRect = proposal.getBoundingClientRect();
+      const btnRect = btnNo.getBoundingClientRect();
+
+      // Calculate safe boundaries
+      const maxX = proposalRect.width - btnRect.width - 40;
+      const maxY = proposalRect.height - btnRect.height - 40;
+
+      let newX = Math.random() * maxX - maxX / 2;
+      let newY = Math.random() * maxY - maxY / 2;
+
+      // Make sure it doesn't overlap with Yes button
+      const yesRect = btnYes.getBoundingClientRect();
+      const proposalCenter = {
+        x: proposalRect.left + proposalRect.width / 2,
+        y: proposalRect.top + proposalRect.height / 2
+      };
+
+      btnNo.style.transform = `translate(${newX}px, ${newY}px)`;
+      btnNo.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1.2)';
+
+      noRunCount++;
+      if (noRunCount < funnyTexts.length) {
+        btnNo.textContent = funnyTexts[noRunCount];
+      }
+
+      // Make Yes button bigger each time
+      const scale = 1 + (noRunCount * 0.05);
+      btnYes.style.transform = `scale(${Math.min(scale, 1.5)})`;
+    }
+
+    btnNo.addEventListener('mouseenter', moveNoButton);
+    btnNo.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // Also move on click as a safety net
+    btnNo.addEventListener('click', (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // ========================
+    // YES BUTTON - CELEBRATION
+    // ========================
+    const celebration = document.getElementById('celebration');
+
+    btnYes.addEventListener('click', () => {
+      // Hide proposal
+      proposal.classList.add('hidden');
+
+      // Launch confetti
+      launchConfetti();
+
+      // Show celebration after a brief delay
+      setTimeout(() => {
+        celebration.style.display = 'flex';
+        // Trigger reflow
+        celebration.offsetHeight;
+        celebration.classList.add('show');
+
+        // Play music if available
+        tryPlayMusic();
+      }, 400);
+
+      // More confetti waves
+      setTimeout(launchConfetti, 800);
+      setTimeout(launchConfetti, 1600);
+    });
+
+    // ========================
+    // CONFETTI
+    // ========================
+    function launchConfetti() {
+      const colors = ['#ff4081', '#ff6b9d', '#ffab40', '#ff80ab', '#e040fb', '#ea80fc', '#ff5252', '#ffd740', '#ff1744', '#f50057'];
+
+      for (let i = 0; i < 80; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+        confetti.style.width = (Math.random() * 8 + 5) + 'px';
+        confetti.style.height = (Math.random() * 8 + 5) + 'px';
+        confetti.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+        confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+        confetti.style.animationDelay = (Math.random() * 0.5) + 's';
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 5000);
+      }
+    }
+
+    // ========================
+    // LIGHTBOX
+    // ========================
+    function openLightbox(item) {
+      const img = item.querySelector('img');
+      const video = item.querySelector('video');
+      const content = document.getElementById('lightboxContent');
+      content.innerHTML = '';
+
+      if (img) {
+        const newImg = document.createElement('img');
+        newImg.src = img.src;
+        newImg.alt = img.alt || '';
+        content.appendChild(newImg);
+      } else if (video) {
+        const newVideo = document.createElement('video');
+        newVideo.src = video.src;
+        newVideo.controls = true;
+        newVideo.autoplay = true;
+        newVideo.style.maxWidth = '90%';
+        newVideo.style.maxHeight = '85vh';
+        newVideo.style.borderRadius = '12px';
+        content.appendChild(newVideo);
+      } else {
+        return; // placeholder card, do nothing
+      }
+
+      document.getElementById('lightbox').classList.add('active');
+    }
+
+    function closeLightbox() {
+      const lightbox = document.getElementById('lightbox');
+      lightbox.classList.remove('active');
+      const video = lightbox.querySelector('video');
+      if (video) video.pause();
+    }
+
+    // Close lightbox on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // ========================
+    // MUSIC
+    // ========================
+    const bgMusic = document.getElementById('bgMusic');
+    const musicToggle = document.getElementById('musicToggle');
+    let isPlaying = false;
+
+    function tryPlayMusic() {
+      if (bgMusic.src || bgMusic.querySelector('source')) {
+        bgMusic.play().then(() => {
+          isPlaying = true;
+          musicToggle.classList.add('playing');
+        }).catch(() => {});
+      }
+    }
+
+    musicToggle.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        isPlaying = false;
+        musicToggle.classList.remove('playing');
+      } else {
+        bgMusic.play().then(() => {
+          isPlaying = true;
+          musicToggle.classList.add('playing');
+        }).catch(() => {});
+      }
+    });
+
+    // ========================
+    // ENTRANCE ANIMATION
+    // ========================
+    window.addEventListener('load', () => {
+      document.getElementById('proposal').style.opacity = '1';
+    });
+  </script>
+
+</body>
+</html>
