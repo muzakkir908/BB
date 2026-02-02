@@ -372,7 +372,15 @@
 <body>
 
   <!-- ==================== PHOTO SLIDESHOW ==================== -->
-  <div class="slideshow" id="slideshow"></div>
+  <div class="slideshow" id="slideshow">
+    <div class="slide active"><img src="./photos/1.jpeg" alt="" /></div>
+    <div class="slide"><img src="./photos/2.jpeg" alt="" /></div>
+    <div class="slide"><img src="./photos/3.jpeg" alt="" /></div>
+    <div class="slide"><img src="./photos/4.jpeg" alt="" /></div>
+    <div class="slide"><img src="./photos/5.jpeg" alt="" /></div>
+    <div class="slide"><img src="./photos/6.jpeg" alt="" /></div>
+    <div class="slide"><img src="./photos/7.jpeg" alt="" /></div>
+  </div>
   <div class="slideshow-overlay"></div>
 
   <!-- Floating Hearts -->
@@ -433,24 +441,12 @@
     const slideshowEl = document.getElementById('slideshow');
     const dotsEl = document.getElementById('slideDots');
     let currentSlide = 0;
-    let slides = [];
+    const slides = Array.from(slideshowEl.querySelectorAll('.slide'));
     let dots = [];
 
     function initSlideshow() {
-      YOUR_PHOTOS.forEach((src, i) => {
-        // Create slide with img tag
-        const slide = document.createElement('div');
-        slide.classList.add('slide');
-        const img = document.createElement('img');
-        img.src = src;
-        img.alt = '';
-        img.draggable = false;
-        slide.appendChild(img);
-        if (i === 0) slide.classList.add('active');
-        slideshowEl.appendChild(slide);
-        slides.push(slide);
-
-        // Create dot
+      // Create dots for each slide
+      slides.forEach((slide, i) => {
         const dot = document.createElement('div');
         dot.classList.add('slide-dot');
         if (i === 0) dot.classList.add('active');
