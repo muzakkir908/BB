@@ -50,13 +50,26 @@
       100% { transform: scale(1.08); }
     }
 
-    /* Dark overlay so text is readable */
+    /* Dark overlay — lighter so photos are clearly visible */
     .slideshow-overlay {
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: radial-gradient(ellipse at center, rgba(0,0,0,0.35) 0%, rgba(0,0,0,0.7) 100%);
+      background: radial-gradient(ellipse at center, rgba(0,0,0,0.25) 0%, rgba(0,0,0,0.55) 100%);
       z-index: 1;
+    }
+
+    /* ==================== DEBUG BANNER (hidden by default) ==================== */
+    .debug-banner {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 9998;
+      background: rgba(255, 0, 0, 0.85);
+      color: #fff;
+      text-align: center;
+      padding: 10px 20px;
+      font-size: 14px;
+      display: none;
     }
 
     /* ==================== FLOATING HEARTS ==================== */
@@ -371,15 +384,33 @@
 </head>
 <body>
 
+  <!-- ==================== DEBUG BANNER (shows if images fail) ==================== -->
+  <div class="debug-banner" id="debugBanner"></div>
+
   <!-- ==================== PHOTO SLIDESHOW ==================== -->
   <div class="slideshow" id="slideshow">
-    <div class="slide active"><img src="./photos/1.jpeg" alt="" /></div>
-    <div class="slide"><img src="./photos/2.jpeg" alt="" /></div>
-    <div class="slide"><img src="./photos/3.jpeg" alt="" /></div>
-    <div class="slide"><img src="./photos/4.jpeg" alt="" /></div>
-    <div class="slide"><img src="./photos/5.jpeg" alt="" /></div>
-    <div class="slide"><img src="./photos/6.jpeg" alt="" /></div>
-    <div class="slide"><img src="./photos/7.jpeg" alt="" /></div>
+    <!-- Slides are hardcoded so browsers preload them properly -->
+    <div class="slide active">
+      <img src="photos/1.jpeg" alt="" draggable="false" />
+    </div>
+    <div class="slide">
+      <img src="photos/2.jpeg" alt="" draggable="false" />
+    </div>
+    <div class="slide">
+      <img src="photos/3.jpeg" alt="" draggable="false" />
+    </div>
+    <div class="slide">
+      <img src="photos/4.jpeg" alt="" draggable="false" />
+    </div>
+    <div class="slide">
+      <img src="photos/5.jpeg" alt="" draggable="false" />
+    </div>
+    <div class="slide">
+      <img src="photos/6.jpeg" alt="" draggable="false" />
+    </div>
+    <div class="slide">
+      <img src="photos/7.jpeg" alt="" draggable="false" />
+    </div>
   </div>
   <div class="slideshow-overlay"></div>
 
@@ -420,33 +451,47 @@
 
   <!-- ==================== JAVASCRIPT ==================== -->
   <script>
-    // ============================================================
-    //  YOUR PHOTOS - JUST ADD YOUR FILENAMES HERE!
-    //  Put your images in the "photos" folder and list them below.
-    //  Example: 'photos/beach-date.jpg'
-    // ============================================================
-    const YOUR_PHOTOS = [
-      'photos/1.jpeg',
-      'photos/2.jpeg',
-      'photos/3.jpeg',
-      'photos/4.jpeg',
-      'photos/5.jpeg',
-      'photos/6.jpeg',
-      'photos/7.jpeg',
-    ];
-
     // ========================
-    // SLIDESHOW
+    // SLIDESHOW (from hardcoded HTML slides)
     // ========================
     const slideshowEl = document.getElementById('slideshow');
     const dotsEl = document.getElementById('slideDots');
     let currentSlide = 0;
-    const slides = Array.from(slideshowEl.querySelectorAll('.slide'));
+    let slides = [];
     let dots = [];
 
     function initSlideshow() {
-      // Create dots for each slide
+      // Grab the slides already in the HTML
+      slides = Array.from(slideshowEl.querySelectorAll('.slide'));
+
+      if (slides.length === 0) return;
+
+      // Track image loading for debugging
+      let loadedCount = 0;
+      let failedCount = 0;
+      const totalImages = slides.length;
+
       slides.forEach((slide, i) => {
+        const img = slide.querySelector('img');
+
+        // Image load success
+        img.addEventListener('load', () => {
+          loadedCount++;
+          console.log(`Image ${i + 1} loaded: ${img.src}`);
+        });
+
+        // Image load failure — show debug info
+        img.addEventListener('error', () => {
+          failedCount++;
+          console.error(`Image ${i + 1} FAILED to load: ${img.src}`);
+
+          // Show debug banner if any images fail
+          const banner = document.getElementById('debugBanner');
+          banner.style.display = 'block';
+          banner.textContent = `⚠️ ${failedCount} image(s) failed to load. Check that the "photos" folder exists alongside index.html with files named 1.jpeg through 7.jpeg`;
+        });
+
+        // Create dot
         const dot = document.createElement('div');
         dot.classList.add('slide-dot');
         if (i === 0) dot.classList.add('active');
@@ -543,14 +588,12 @@
       const vh = window.innerHeight;
       const btnRect = btnNo.getBoundingClientRect();
 
-      // Random position within viewport, avoiding edges
       const margin = 30;
       const maxX = vw - btnRect.width - margin;
       const maxY = vh - btnRect.height - margin;
       const newX = Math.random() * (maxX - margin) + margin;
       const newY = Math.random() * (maxY - margin) + margin;
 
-      // Use fixed positioning for full-viewport escape
       btnNo.style.position = 'fixed';
       btnNo.style.left = newX + 'px';
       btnNo.style.top = newY + 'px';
@@ -565,7 +608,6 @@
         btnNo.textContent = funnyTexts[Math.floor(Math.random() * funnyTexts.length)];
       }
 
-      // Make Yes button grow bigger
       const scale = 1 + (noRunCount * 0.06);
       btnYes.style.transform = `scale(${Math.min(scale, 1.6)})`;
     }
@@ -586,23 +628,18 @@
     const celebration = document.getElementById('celebration');
 
     btnYes.addEventListener('click', () => {
-      // Hide proposal & slideshow dots
       proposal.classList.add('hidden');
       btnNo.style.display = 'none';
       dotsEl.style.display = 'none';
 
-      // Launch confetti
       launchConfetti();
 
-      // Show celebration
       setTimeout(() => {
         celebration.style.display = 'flex';
-        // Trigger reflow
         celebration.offsetHeight;
         celebration.classList.add('show');
       }, 300);
 
-      // More confetti waves
       setTimeout(launchConfetti, 700);
       setTimeout(launchConfetti, 1400);
       setTimeout(launchConfetti, 2500);
