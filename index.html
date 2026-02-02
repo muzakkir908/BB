@@ -29,10 +29,15 @@
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background-size: cover;
-      background-position: center;
       opacity: 0;
       transition: opacity 1.5s ease-in-out;
+      overflow: hidden;
+    }
+
+    .slideshow .slide img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
       animation: slowZoom 8s ease-in-out infinite alternate;
     }
 
@@ -433,10 +438,14 @@
 
     function initSlideshow() {
       YOUR_PHOTOS.forEach((src, i) => {
-        // Create slide
+        // Create slide with img tag
         const slide = document.createElement('div');
         slide.classList.add('slide');
-        slide.style.backgroundImage = `url('${encodeURI(src)}')`;
+        const img = document.createElement('img');
+        img.src = src;
+        img.alt = '';
+        img.draggable = false;
+        slide.appendChild(img);
         if (i === 0) slide.classList.add('active');
         slideshowEl.appendChild(slide);
         slides.push(slide);
